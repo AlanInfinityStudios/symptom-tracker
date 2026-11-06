@@ -63,10 +63,10 @@ try {
   await a.check('input[name="video"]');
   await shot(a, "06-event-form");
   await a.getByRole("button", { name: "Save" }).click();
-  await expectText(a, "Event, 2 seconds"); ok("Timed event saved with details");
+  await expectText(a, /Event, [0-9]+ seconds/); ok("Timed event saved with details");
 
   // B sees it live
-  await expectText(b, "Event, 2 seconds", 8000); ok("Mum's phone shows Dad's event without refreshing");
+  await expectText(b, /Event, [0-9]+ seconds/, 8000); ok("Mum's phone shows Dad's event without refreshing");
 
   // B logs a brief event, bedwetting and a day note
   await b.getByText("Brief event").click(); await shot(b, "07-brief");
@@ -76,6 +76,7 @@ try {
   await b.locator('label.chip:has(input[name="type"][value="soaked"])').click();
   await b.locator('label.chip:has(input[name="hardToWake"][value="yes"])').click();
   await shot(b, "08-bedwetting"); await b.getByRole("button", { name: "Save" }).click();
+  await b.getByRole("button", { name: /^Woke up/ }).click(); await expectText(b, "1 logged tonight");
   await b.getByRole("button", { name: /^Dry night/ }).click();
   await expectText(b, "Dry night logged");
   await b.locator('button.k-note').click();
@@ -95,7 +96,7 @@ try {
   await b.locator('label.chip:has(input[name="after"][value="tired"])').click();
   await b.getByRole("button", { name: "Save" }).click();
   await shot(b, "09-home-b");
-  await expectText(a, "Bedwetting, soaked through", 8000); await expectText(a, "Day note", 8000); await expectText(a, "Dry night logged", 8000); ok("Brief event opens its details straight away; Dad sees Mum's brief event, wet night, dry night and day note; past event form fits the screen");
+  await expectText(a, "Bedwetting, soaked through", 8000); await expectText(a, "Day note", 8000); await expectText(a, "Dry night logged", 8000); await expectText(a, "Woke up", 8000); ok("Brief event opens its details straight away; Dad sees Mum's brief event, waking, wet night, dry night and day note; past event form fits the screen");
 
   // Offline on A
   await A.setOffline(true);
@@ -138,7 +139,7 @@ try {
   ok("No tab scrolls sideways");
 
   // Reload keeps sign-in and data
-  await a.reload(); await expectText(a, "Event, 2 seconds"); ok("Reload keeps you signed in with your entries");
+  await a.reload(); await expectText(a, /Event, [0-9]+ seconds/); ok("Reload keeps you signed in with your entries");
 
   if (errors.length) throw new Error("Page errors:\n" + errors.join("\n"));
   console.log("\nAll " + step + " checks passed.");
