@@ -70,7 +70,8 @@ label.f textarea{min-height:90px;resize:vertical}
 .chip input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
 .check{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-weight:600}
 .check input{width:22px;height:22px}
-nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0);z-index:5}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 72px env(safe-area-inset-bottom,0) 0;z-index:5}
+/* the right-hand 72px is left clear for the "Powered by Netlify" badge on the free plan */
 nav.tabs button{flex:1;max-width:160px;background:none;border:0;padding:10px 4px 12px;font-size:13px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 nav.tabs button svg{width:24px;height:24px}
 nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:700}
