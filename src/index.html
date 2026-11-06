@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>Symptom Tracker</title>
 <meta name="theme-color" content="#f4f6f8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121619" media="(prefers-color-scheme: dark)">
@@ -21,16 +21,26 @@
   --radius:16px; --shadow:0 1px 2px rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.04);
 }
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --bg:#121619; --card:#1b2126; --ink:#e7edf1; --muted:#9aa8b2; --line:#2c353c;
     --accent:#5bb3d1; --accent-ink:#0b1a20; --accent-soft:#183039;
     --event:#fb8c55; --event-soft:#3a2418; --wet:#7aa7ff; --wet-soft:#1c2740; --note:#b7a5ea; --note-soft:#2a2440;
     --ok:#6fcf97; --warn:#f2b45a; --danger:#ff8a80; --shadow:none;
-  }
+ color-scheme:dark}
 }
+:root[data-theme="dark"]{
+    --bg:#121619; --card:#1b2126; --ink:#e7edf1; --muted:#9aa8b2; --line:#2c353c;
+    --accent:#5bb3d1; --accent-ink:#0b1a20; --accent-soft:#183039;
+    --event:#fb8c55; --event-soft:#3a2418; --wet:#7aa7ff; --wet-soft:#1c2740; --note:#b7a5ea; --note-soft:#2a2440;
+    --ok:#6fcf97; --warn:#f2b45a; --danger:#ff8a80; --shadow:none;
+ color-scheme:dark}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
-body{padding:env(safe-area-inset-top,0) 0 calc(76px + env(safe-area-inset-bottom,0)) 0}
+html,body{margin:0;max-width:100%;overflow-x:hidden;overscroll-behavior:none;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+body{padding:env(safe-area-inset-top,0) 0 calc(76px + env(safe-area-inset-bottom,0)) 0;-webkit-tap-highlight-color:transparent}
+body.locked{position:fixed;left:0;right:0;overflow:hidden}
+input,select,textarea{min-width:0;max-width:100%;font-size:16px}
+input[type=date],input[type=datetime-local],input[type=time]{-webkit-appearance:none;appearance:none;text-align:left}
+input::-webkit-date-and-time-value{text-align:left}
 [hidden]{display:none!important}
 button,input,select,textarea{font:inherit;color:inherit}
 main{max-width:640px;margin:0 auto;padding:12px 16px 24px}
@@ -48,6 +58,12 @@ header.top h1{font-size:20px;margin:0;flex:1;letter-spacing:-.01em}
 .btn.block{display:flex;width:100%}
 .btn:disabled{opacity:.55}
 .row{display:flex;gap:10px;flex-wrap:wrap}
+.row>label.f{flex:1 1 140px}
+.dialog-wrap{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:30;display:flex;align-items:center;justify-content:center;padding:16px}
+.dialog{background:var(--card);border-radius:18px;padding:18px;width:100%;max-width:420px}
+.dialog h2{margin:0 0 8px;font-size:19px}
+.dialog p{margin:0 0 14px}
+.dialog .row{margin-top:6px}
 .row>.btn{flex:1}
 .big-event{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:132px;border-radius:20px;border:0;background:var(--event);color:#fff;font-size:24px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
 @media (prefers-color-scheme: dark){.big-event{color:#1d0f07}}
@@ -55,9 +71,11 @@ header.top h1{font-size:20px;margin:0;flex:1;letter-spacing:-.01em}
 .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
 .quick button{min-height:72px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-weight:600;cursor:pointer;padding:10px;text-align:left;display:flex;flex-direction:column;justify-content:center}
 .quick button small{font-weight:400;color:var(--muted);font-size:13px}
-.quick .k-event{border-left:5px solid var(--event)} .quick .k-wet{border-left:5px solid var(--wet)} .quick .k-note{border-left:5px solid var(--note)}
+.quick .k-event{border-left:5px solid var(--event)} .quick .k-wet{border-left:5px solid var(--wet)} .quick .k-note{border-left:5px solid var(--note)} .quick .k-dry{border-left:5px solid var(--ok)} .quick .wide{grid-column:1 / -1}
+.tag.dry{background:var(--ok)}
 label.f{display:block;margin:0 0 14px;font-weight:600;font-size:15px}
-label.f input,label.f select,label.f textarea{display:block;width:100%;margin-top:6px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-weight:400;min-height:48px}
+label.f{min-width:0}
+label.f input,label.f select,label.f textarea{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-weight:400;min-height:48px}
 label.f textarea{min-height:90px;resize:vertical}
 .fs{margin:0 0 16px;border:0;padding:0}
 .fs legend{font-weight:600;font-size:15px;padding:0;margin-bottom:8px}
@@ -81,8 +99,8 @@ nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:700}
 .tag.bedwetting{background:var(--wet)} .tag.daynote{background:var(--note)}
 .entry .t{font-weight:600} .entry .d{font-size:14px;color:var(--muted)}
 .day-h{font-size:14px;font-weight:700;color:var(--muted);margin:18px 0 6px;text-transform:uppercase;letter-spacing:.04em}
-.sheet-wrap{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:20;display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:var(--card);width:100%;max-width:640px;max-height:94vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0))}
+.sheet-wrap{position:fixed;inset:0;overscroll-behavior:contain;touch-action:pan-y;background:rgba(0,0,0,.4);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);width:100%;max-width:640px;max-height:92vh;max-height:92dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0))}
 @media (min-width:700px){.sheet-wrap{align-items:center}.sheet{border-radius:20px}}
 .sheet h2{margin:0 0 14px;font-size:20px}
 .sheet .bar{display:flex;gap:10px;position:sticky;bottom:-18px;background:var(--card);padding:12px 0 4px;margin-top:8px}
@@ -116,6 +134,7 @@ a{color:var(--accent)}
   <button data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</button>
 </nav>
 <div id="sheet"></div>
+<div id="dialog"></div>
 <div id="toast" class="toast" hidden></div>
 
 <script src="/vendor/supabase-2.117.3.js"></script>
@@ -123,7 +142,8 @@ a{color:var(--accent)}
 <script>
 "use strict";
 /* ---------- Config (filled in by build.mjs) ---------- */
-const CONFIG = { supabaseUrl: "__SUPABASE_URL__", supabaseKey: "__SUPABASE_KEY__", mockUrl: "__MOCK_URL__" };
+const CONFIG = { supabaseUrl: "__SUPABASE_URL__", supabaseKey: "__SUPABASE_KEY__", mockUrl: "__MOCK_URL__", demo: "__DEMO__" };
+const DEMO = CONFIG.demo === "1";
 
 /* ---------- Wording ---------- */
 const DURATIONS = [["brief","About 2 to 3 seconds"],["short","About 5 to 10 seconds"],["long","About 20 seconds"],["longer","Longer than 30 seconds"]];
@@ -133,12 +153,15 @@ const SIGNS = [["staring","Staring"],["eyelids","Eyelids fluttering"],["mouth","
 const RESPONDED = [["yes","Yes"],["partly","Partly"],["no","No"],["untested","Didn't try"]];
 const AFTER = [["normal","Straight back to normal"],["confused","Confused"],["tired","Tired"],["asleep","Fell asleep"]];
 const FACTORS = [["poorsleep","Poor sleep"],["unwell","Unwell or temperature"],["missedmeal","Missed a meal"],["stress","Stressed or upset"],["hot","Very hot"],["exercise","Lots of exercise"]];
+// Nights are stored as kind "bedwetting"; type "dry" is a positively logged dry night.
 const WET_TYPE = [["accident","Small accident, didn't make it in time"],["soaked","Soaked through, out of it"]];
+const NIGHT_TYPE = [["dry","Dry night"]].concat(WET_TYPE);
+const isDry = e => e.kind === "bedwetting" && e.data && e.data.type === "dry";
 const YESNO = [["yes","Yes"],["no","No"],["unknown","Don't know"]];
 const SLEEP = [["good","Good"],["ok","OK"],["poor","Poor"]];
 const MOOD = [["good","Good"],["ok","OK"],["low","Low or grumpy"]];
 const lbl = (list, v) => { const f = list.find(x => x[0] === v); return f ? f[1] : (v || ""); };
-const low = s => s ? s.charAt(0).toLowerCase() + s.slice(1) : "";
+const low = s => !s ? "" : /^[A-Z]{2}/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1);
 const bandFor = s => s == null || s === "" ? "" : s <= 4 ? "brief" : s <= 12 ? "short" : s <= 30 ? "long" : "longer";
 
 /* ---------- Small helpers ---------- */
@@ -151,10 +174,12 @@ const dayKey = d => { d = new Date(d); return d.getFullYear()+"-"+pad(d.getMonth
 const fmtTime = d => new Date(d).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 const fmtDay = d => new Date(d).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
 const fmtDate = d => new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+// Device storage, with an in-memory fallback for browsers that block it.
+const memStore = {};
 const store = {
-  get(k, def) { try { const v = localStorage.getItem("st." + k); return v == null ? def : JSON.parse(v); } catch (e) { return def; } },
-  set(k, v) { try { localStorage.setItem("st." + k, JSON.stringify(v)); } catch (e) {} },
-  del(k) { try { localStorage.removeItem("st." + k); } catch (e) {} }
+  get(k, def) { try { const v = localStorage.getItem("st." + k); if (v != null) return JSON.parse(v); } catch (e) {} return k in memStore ? JSON.parse(memStore[k]) : def; },
+  set(k, v) { memStore[k] = JSON.stringify(v); try { localStorage.setItem("st." + k, memStore[k]); } catch (e) {} },
+  del(k) { delete memStore[k]; try { localStorage.removeItem("st." + k); } catch (e) {} }
 };
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); }
 function chips(name, list, value, multi) {
@@ -168,6 +193,7 @@ const checkVals = (form, n) => [...form.querySelectorAll('input[name="' + n + '"
 /* ---------- Backend: Supabase, or a test server when CONFIG.mockUrl is set ---------- */
 const realUrl = v => v && !/^__/.test(v);
 const api = (() => {
+  if (DEMO) return demoApi();
   if (realUrl(CONFIG.mockUrl)) return mockApi(CONFIG.mockUrl);
   const sb = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
   const ok = r => { if (r.error) throw r.error; return r.data; };
@@ -195,6 +221,43 @@ const api = (() => {
     async deleteDiary(diaryId) { ok(await sb.rpc("delete_diary", { d: diaryId })); }
   };
 })();
+
+// Preview mode: everything stays in this browser, with sample entries to look at.
+function demoApi() {
+  const ME = "demo-dad", MUM = "demo-mum", D = "demo-diary";
+  const seed = () => {
+    const t = (daysAgo, h, m) => { const d = new Date(); d.setDate(d.getDate() - daysAgo); d.setHours(h, m, 0, 0); return d.toISOString(); };
+    const e = (kind, at, by, data) => ({ id: uuid(), diary_id: D, kind, occurred_at: at, data, deleted: false, created_by: by, updated_by: by, updated_at: at });
+    return { members: [{ user_id: ME, label: "Dad", role: "owner" }, { user_id: MUM, label: "Mum", role: "carer" }], entries: [
+      e("event", t(19, 7, 40), MUM, { duration: "brief", certainty: "probable", seenBy: "Mum", before: ["eating"] }),
+      e("event", t(18, 17, 5), ME, { duration: "long", seconds: 21, certainty: "definite", seenBy: "Dad", before: ["screen"], signs: ["staring", "eyelids"], responded: "no", after: ["tired", "asleep"], sleptAt: "17:20", sleptMins: 50, video: true, factors: ["poorsleep"] }),
+      e("bedwetting", t(17, 3, 10), MUM, { type: "soaked", hardToWake: "yes" }),
+      e("event", t(17, 8, 15), "demo-dad", { duration: "brief", certainty: "unsure", seenBy: "Grandparent" }),
+      e("daynote", t(17, 20, 0), MUM, { day: dayKey(t(17, 12, 0)), sleep: "poor", mood: "low", notes: "Very tired all day after the long one yesterday." }),
+      ...[16, 15, 14, 13, 12, 10, 9, 8, 7, 6, 5, 3, 2, 1, 0].map(n => e("bedwetting", t(n, 7, 30), n % 2 ? MUM : ME, { type: "dry" })),
+      e("event", t(6, 16, 30), ME, { duration: "brief", certainty: "definite", seenBy: "Dad", before: ["talking"], signs: ["staring"], responded: "no", after: ["normal"] }),
+      e("bedwetting", t(4, 0, 0), ME, { type: "accident", foundMorning: true }),
+      e("event", t(1, 18, 45), MUM, { duration: "short", certainty: "probable", seenBy: "Mum", before: ["drowsy"], after: ["tired"] }),
+      e("daynote", t(1, 20, 0), ME, { day: dayKey(t(1, 12, 0)), sleep: "ok", notes: "School trip, late to bed." })
+    ] };
+  };
+  const load = () => { const v = store.get("demoDb", null); if (v) return v; const s = seed(); store.set("demoDb", s); return s; };
+  const save = db => store.set("demoDb", db);
+  if (!store.get("child." + D, null)) store.set("child." + D, { name: "Example child", dob: "2018-05-01", doctor: "Example paediatrician" });
+  store.set("diary", D);
+  return {
+    async session() { return { userId: ME, email: "preview@example.com" }; },
+    async signIn() { return { userId: ME, email: "preview@example.com" }; }, async signUp() { return this.signIn(); }, async signOut() {},
+    async myDiaries() { return [{ diary_id: D, label: "Dad", role: "owner" }]; },
+    async createDiary() { return D; }, async joinDiary() { return D; }, async createInvite() { return "PREVIEW1"; },
+    async members() { return load().members; },
+    async setLabel(d, u, label) { const db = load(); db.members.find(m => m.user_id === ME).label = label; save(db); },
+    async upsert(rows) { const db = load(); const now = new Date().toISOString(); const out = rows.map(r => { const i = db.entries.findIndex(x => x.id === r.id); const old = i >= 0 ? db.entries[i] : null; const row = Object.assign({}, r, { created_by: old ? old.created_by : ME, updated_by: ME, updated_at: now }); if (i >= 0) db.entries[i] = row; else db.entries.push(row); return row; }); save(db); return out; },
+    async pull(d, since) { return load().entries.filter(e => !since || e.updated_at > since); },
+    subscribe() { return () => {}; },
+    async deleteDiary() { store.del("demoDb"); store.del("cache." + D); store.del("queue." + D); location.reload(); }
+  };
+}
 
 function mockApi(base) {
   const call = async (op, body) => {
@@ -262,12 +325,29 @@ async function syncNow(quiet) {
     S.lastPull = max;
     try { S.members = await api.members(S.diaryId); } catch (e) {}
     S.syncError = ""; S.online = true;
+    dailyBackup();
   } catch (e) {
     S.syncError = (e && e.message) || "Could not reach the server";
     if (!navigator.onLine || /fetch|network|Failed/i.test(S.syncError)) S.online = false;
   } finally {
     S.syncing = false; saveDiaryCache(); setSyncUi(); if (!$(".sheet")) render();
   }
+}
+// A copy of the whole diary is kept on this device once a day; the last 10 days are kept.
+function backups() { return store.get("backups." + S.diaryId, []); }
+function dailyBackup() {
+  const list = backups(), today = dayKey(new Date());
+  if (list.length && list[0].day === today) list.shift();
+  const entries = Object.values(S.entries).map(e => { const c = Object.assign({}, e); delete c._local; return c; });
+  if (!entries.length) return;
+  list.unshift({ day: today, at: new Date().toISOString(), entries });
+  store.set("backups." + S.diaryId, list.slice(0, 10));
+}
+function backupCsv(entries, name) {
+  const cols = ["kind", "occurred_at", "logged_by", "summary", "details"];
+  const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+  const rows = entries.filter(e => !e.deleted).sort((a, b) => a.occurred_at.localeCompare(b.occurred_at)).map(e => [e.kind, e.occurred_at, whoLabel(e.created_by), entryTitle(e), entryDetails(e, true)].map(q).join(","));
+  downloadBlob(new Blob([cols.join(",") + "\n" + rows.join("\n")], { type: "text/csv" }), name);
 }
 function setSyncUi() {
   const n = Object.keys(S.queue).length;
@@ -296,6 +376,7 @@ function durText(d) { return d.seconds ? d.seconds + " seconds" : d.duration ? l
 function entryTitle(e) {
   const d = e.data || {};
   if (e.kind === "event") return "Event, " + durText(d);
+  if (e.kind === "bedwetting" && d.type === "dry") return "Dry night";
   if (e.kind === "bedwetting") return d.type === "soaked" ? "Bedwetting, soaked through" : d.type === "accident" ? "Bedwetting, small accident" : "Bedwetting";
   return "Day note";
 }
@@ -311,6 +392,8 @@ function entryDetails(e, long) {
     if (d.sleptAt) out.push("asleep at " + d.sleptAt + (d.sleptMins ? " for about " + d.sleptMins + " min" : ""));
     if (d.video) out.push("video taken");
     if (long && d.factors && d.factors.length) out.push("factors: " + d.factors.map(v => low(lbl(FACTORS, v))).join(", "));
+  } else if (e.kind === "bedwetting" && d.type === "dry") {
+    // nothing extra to show
   } else if (e.kind === "bedwetting") {
     if (d.foundMorning) out.push("found in the morning");
     if (d.hardToWake) out.push("hard to wake or confused: " + low(lbl(YESNO, d.hardToWake)));
@@ -324,7 +407,7 @@ function entryDetails(e, long) {
 }
 function entryRow(e) {
   const by = whoLabel(e.created_by);
-  return '<button class="entry" data-act="edit" data-id="' + e.id + '"><span class="tag ' + e.kind + '"></span><span><span class="t">' + esc(entryTitle(e)) + '</span><br><span class="d">' + esc((e.kind === "daynote" ? "" : fmtTime(e.occurred_at) + " · ") + entryDetails(e)) + (by ? " · logged by " + esc(by) : "") + (S.queue[e.id] ? " · not synced yet" : "") + "</span></span></button>";
+  return '<button class="entry" data-act="edit" data-id="' + e.id + '"><span class="tag ' + (isDry(e) ? "dry" : e.kind) + '"></span><span><span class="t">' + esc(entryTitle(e)) + '</span><br><span class="d">' + esc((e.kind === "daynote" ? "" : fmtTime(e.occurred_at) + " · ") + entryDetails(e)) + (by ? " · logged by " + esc(by) : "") + (S.queue[e.id] ? " · not synced yet" : "") + "</span></span></button>";
 }
 
 /* ---------- Screens ---------- */
@@ -370,14 +453,17 @@ function homeView() {
   const nudge = lastEvent && ["long", "longer"].includes(lastEvent.data.duration) && Date.now() - new Date(lastEvent.occurred_at) < 6 * 3600e3 && !(lastEvent.data.after || []).length
     ? '<div class="notice">How was he after the event at ' + fmtTime(lastEvent.occurred_at) + '? <a href="#" data-act="edit" data-id="' + lastEvent.id + '">Add how he was afterwards</a></div>' : "";
   const myNoteToday = list.find(e => e.kind === "daynote" && e.data.day === today && e.created_by === S.user.userId);
+  const nightToday = list.find(e => e.kind === "bedwetting" && dayKey(e.occurred_at) === today);
   const setupHint = !child().name ? '<div class="notice">Add your son\'s name and date of birth in <a href="#" data-act="tab" data-tab="more">More</a>. They stay on this device and only appear in the PDF report.</div>' : "";
-  return setupHint + nudge +
+  const demoNote = DEMO ? '<div class="notice"><b>Preview with sample data.</b> Try anything here, nothing is saved online and the live app is not affected. Reset it in More.</div>' : "";
+  return demoNote + setupHint + nudge +
     '<button class="big-event" data-act="timer">Event now<small>Tap when it starts, tap again when it ends</small></button>' +
     '<div class="quick">' +
       '<button class="k-event" data-act="brief">Brief event<small>2 to 3 seconds, one tap</small></button>' +
       '<button class="k-event" data-act="new" data-kind="event">Log a past event<small>Something you saw earlier</small></button>' +
-      '<button class="k-wet" data-act="new" data-kind="bedwetting">Bedwetting<small>Accident or soaked through</small></button>' +
-      '<button class="k-note" data-act="' + (myNoteToday ? "edit" : "new") + '" data-kind="daynote"' + (myNoteToday ? ' data-id="' + myNoteToday.id + '"' : "") + '>Day note<small>' + (myNoteToday ? "Edit today's note" : "Notes on today") + "</small></button>" +
+      (nightToday && isDry(nightToday) ? '<button class="k-dry" data-act="edit" data-id="' + nightToday.id + '">Dry night logged<small>Tap to change</small></button>' : '<button class="k-dry" data-act="dry">Dry night<small>One tap in the morning</small></button>') +
+      '<button class="k-wet" data-act="new" data-kind="bedwetting">Wet night<small>Accident or soaked through</small></button>' +
+      '<button class="k-note wide" data-act="' + (myNoteToday ? "edit" : "new") + '" data-kind="daynote"' + (myNoteToday ? ' data-id="' + myNoteToday.id + '"' : "") + '>Day note<small>' + (myNoteToday ? "Edit today's note" : "Notes on today") + "</small></button>" +
     "</div>" +
     '<div class="card"><h2>Last 3 days</h2>' + (recent.length ? recent.map(entryRow).join("") : '<p class="muted small">Nothing logged in the last 3 days.</p>') + "</div>";
 }
@@ -388,7 +474,7 @@ function diaryView() {
   const groups = {}; list.forEach(e => { const k = e.kind === "daynote" && e.data.day ? e.data.day : dayKey(e.occurred_at); (groups[k] = groups[k] || []).push(e); });
   const keys = Object.keys(groups).sort().reverse();
   const fb = (v, l) => '<label class="chip"><input type="radio" name="flt" value="' + v + '"' + (f === v ? " checked" : "") + ' data-act="filter"><span>' + l + "</span></label>";
-  return '<div class="filters chips">' + fb("all", "Everything") + fb("event", "Events") + fb("bedwetting", "Bedwetting") + fb("daynote", "Day notes") + "</div>" +
+  return '<div class="filters chips">' + fb("all", "Everything") + fb("event", "Events") + fb("bedwetting", "Nights") + fb("daynote", "Day notes") + "</div>" +
     (keys.length ? keys.map(k => '<div class="day-h">' + esc(fmtDay(k + "T12:00")) + '</div><div class="card" style="padding:4px 16px">' + groups[k].map(entryRow).join("") + "</div>").join("") : '<p class="muted">Nothing here yet.</p>');
 }
 
@@ -400,10 +486,16 @@ function reportView() {
   return '<div class="card"><h2>Report for the paediatrician</h2><p class="small muted">Makes a PDF you can attach to an email. ' + esc(child().name ? child().name + "'s name and details are added from this device." : "Add your son's details in More first so the PDF says who it is about.") + "</p>" +
     '<div class="row"><label class="f" style="flex:1">From<input type="date" id="rFrom" value="' + from + '"></label><label class="f" style="flex:1">To<input type="date" id="rTo" value="' + to + '"></label></div>' +
     '<div class="row" style="margin-bottom:14px"><button class="btn" data-act="range" data-days="30">Last 30 days</button><button class="btn" data-act="range" data-days="90">Last 90 days</button><button class="btn" data-act="range" data-days="all">Everything</button></div>' +
-    '<div class="stats"><div class="stat"><b>' + data.events.length + "</b><span>events</span></div><div class=\"stat\"><b>" + data.events.filter(e => e.data.certainty === "definite").length + "</b><span>definitely seen</span></div><div class=\"stat\"><b>" + data.wets.length + "</b><span>bedwetting</span></div></div>" +
+    '<div class="stats"><div class="stat"><b>' + data.events.length + "</b><span>events</span></div><div class=\"stat\"><b>" + data.events.filter(e => e.data.certainty === "definite").length + "</b><span>definitely seen</span></div><div class=\"stat\"><b>" + data.wets.length + " / " + data.dry.length + "</b><span>wet / dry nights</span></div></div>" +
     '<div style="margin-top:16px"><button class="btn primary block" data-act="pdf">Make PDF report</button></div></div>';
 }
 
+function backupCard() {
+  const list = backups();
+  return '<div class="card"><h2>Backups on this device</h2><p class="small muted">A copy of the diary is saved on this device each day you open the app, and the last 10 are kept. The diary is also stored online and on each phone that uses it.</p>' +
+    (list.length ? list.map((b, i) => '<div class="row" style="align-items:center;margin:8px 0"><span style="flex:1 1 140px"><b>' + esc(fmtDay(b.at)) + '</b><br><span class="small muted">' + b.entries.filter(e => !e.deleted).length + ' entries</span></span><button class="btn" data-act="dlbackup" data-i="' + i + '">Download</button><button class="btn" data-act="restore" data-i="' + i + '">Restore</button></div>').join("") : '<p class="small muted">The first backup is made after the diary next syncs.</p>') +
+    '<button class="btn block" style="margin-top:6px" data-act="export">Download everything now (CSV)</button></div>';
+}
 function moreView() {
   const c = child(), members = S.members.length ? S.members : [{ user_id: S.user.userId, label: myLabel(), role: "owner" }];
   const owner = members.find(m => m.user_id === S.user.userId && m.role === "owner");
@@ -417,14 +509,33 @@ function moreView() {
     '<p class="small muted">To add your partner, make a code and send it to them. They create their own account, then choose "Join with a code". Each code works once and lasts 7 days.</p>' +
     '<div id="inviteOut"></div><button class="btn block" data-act="invite">Make an invite code</button>' +
     '<button class="btn block" style="margin-top:10px" data-act="rename">Change my name in the diary</button></div>' +
-    '<div class="card"><h2>Account</h2><p class="small muted">Signed in as ' + esc(S.user.email || "") + '.</p><button class="btn block" data-act="export">Download a backup (CSV)</button><button class="btn block" style="margin-top:10px" data-act="signout">Sign out</button>' +
+    backupCard() +
+    '<div class="card"><h2>Account</h2><p class="small muted">Signed in as ' + esc(S.user.email || "") + '.</p><button class="btn block" data-act="signout">Sign out</button>' +
     (owner ? '<button class="btn block danger" style="margin-top:10px" data-act="deldiary">Delete the whole diary</button>' : "") + "</div>" +
+    (DEMO ? '<div class="card"><h2>Preview</h2><button class="btn block" data-act="resetdemo">Reset sample data</button></div>' : "") +
     '<p class="small muted" style="text-align:center">Symptom Tracker · entries are stored without names</p>';
 }
 
 /* ---------- Entry forms ---------- */
-function openSheet(html) { $("#sheet").innerHTML = '<div class="sheet-wrap" data-act="closebg"><div class="sheet" role="dialog" aria-modal="true">' + html + "</div></div>"; document.body.style.overflow = "hidden"; }
-function closeSheet() { if (S.timerInt) { clearInterval(S.timerInt); S.timerInt = null; } $("#sheet").innerHTML = ""; document.body.style.overflow = ""; render(); }
+function lockPage() { if (document.body.classList.contains("locked")) return; S.scrollY = window.scrollY; document.body.style.top = -S.scrollY + "px"; document.body.classList.add("locked"); }
+function unlockPage() { if (!document.body.classList.contains("locked")) return; document.body.classList.remove("locked"); document.body.style.top = ""; window.scrollTo(0, S.scrollY || 0); }
+function openSheet(html) { lockPage(); $("#sheet").innerHTML = '<div class="sheet-wrap" data-act="closebg"><div class="sheet" role="dialog" aria-modal="true">' + html + "</div></div>"; }
+function closeSheet() { if (S.timerInt) { clearInterval(S.timerInt); S.timerInt = null; } $("#sheet").innerHTML = ""; render(); unlockPage(); }
+// In-app replacement for confirm() and prompt(). Resolves with true, the typed text, or null.
+function ask(o) {
+  return new Promise(done => {
+    const box = $("#dialog");
+    box.innerHTML = '<div class="dialog-wrap"><form class="dialog" id="askForm" role="alertdialog" aria-modal="true"><h2>' + esc(o.title) + "</h2>" + (o.text ? "<p>" + esc(o.text) + "</p>" : "") +
+      (o.input != null || o.typeWord ? '<label class="f">' + esc(o.label || (o.typeWord ? "Type " + o.typeWord + " to confirm" : "")) + '<input id="askInput" autocomplete="off" value="' + esc(o.input || "") + '"></label>' : "") +
+      '<div class="row"><button type="button" class="btn" id="askNo">Cancel</button><button type="submit" class="btn ' + (o.danger ? "danger" : "primary") + '" id="askYes">' + esc(o.ok || "OK") + "</button></div></form></div>";
+    const inp = $("#askInput"), yes = $("#askYes");
+    if (o.typeWord) { yes.disabled = true; inp.addEventListener("input", () => yes.disabled = inp.value.trim().toUpperCase() !== o.typeWord); }
+    const finish = v => { box.innerHTML = ""; done(v); };
+    $("#askNo").onclick = () => finish(null);
+    $("#askForm").onsubmit = ev => { ev.preventDefault(); ev.stopPropagation(); finish(o.input != null ? inp.value.trim() || null : true); };
+    if (inp) setTimeout(() => inp.focus(), 50);
+  });
+}
 
 function seenByOptions() {
   const labels = [...new Set([...(S.members.map(m => m.label)), myLabel(), "Grandparent", "School", "Other"])];
@@ -451,11 +562,11 @@ function eventForm(e) {
 }
 function wetForm(e) {
   const d = e.data || {};
-  return '<form id="entryForm" data-id="' + e.id + '"><h2>' + (S.entries[e.id] ? "Edit bedwetting" : "Bedwetting") + "</h2>" +
+  return '<form id="entryForm" data-id="' + e.id + '"><h2>' + (S.entries[e.id] ? "Edit night" : "Night") + "</h2>" +
     '<label class="f">When<input type="datetime-local" name="when" value="' + toLocalInput(e.occurred_at) + '" required></label>' +
-    '<label class="check"><input type="checkbox" name="foundMorning"' + (d.foundMorning ? " checked" : "") + "> Found in the morning, time unknown</label>" +
-    fieldset("What kind?", chips("type", WET_TYPE, d.type)) +
-    fieldset("Hard to wake, confused or unusually sleepy?", chips("hardToWake", YESNO, d.hardToWake)) +
+    fieldset("How was the night?", chips("type", NIGHT_TYPE, d.type)) +
+    '<div id="wetBox"' + (d.type === "dry" ? " hidden" : "") + '><label class="check"><input type="checkbox" name="foundMorning"' + (d.foundMorning ? " checked" : "") + "> Found in the morning, time unknown</label>" +
+    fieldset("Hard to wake, confused or unusually sleepy?", chips("hardToWake", YESNO, d.hardToWake)) + "</div>" +
     '<label class="f">Notes<textarea name="notes">' + esc(d.notes || "") + "</textarea></label>" + formBar(e) + "</form>";
 }
 function noteForm(e) {
@@ -491,6 +602,7 @@ function readForm(form) {
   } else if (e.kind === "bedwetting") {
     e.occurred_at = new Date(form.when.value).toISOString();
     Object.assign(d, { foundMorning: form.foundMorning.checked, type: radioVal(form, "type"), hardToWake: radioVal(form, "hardToWake"), notes });
+    if (d.type === "dry") { d.foundMorning = false; d.hardToWake = ""; }
   } else {
     d.day = form.day.value; e.occurred_at = new Date(d.day + "T20:00").toISOString();
     Object.assign(d, { sleep: radioVal(form, "sleep"), unwell: form.unwell.checked, mood: radioVal(form, "mood"), notes });
@@ -527,7 +639,7 @@ function reportData(from, to) {
   const a = new Date(from + "T00:00"), b = new Date(to + "T23:59:59.999");
   const inRange = e => { const t = e.kind === "daynote" && e.data.day ? new Date(e.data.day + "T12:00") : new Date(e.occurred_at); return t >= a && t <= b; };
   const list = liveEntries().filter(inRange).reverse();
-  return { from, to, a, b, list, events: list.filter(e => e.kind === "event"), wets: list.filter(e => e.kind === "bedwetting"), notes: list.filter(e => e.kind === "daynote") };
+  return { from, to, a, b, list, events: list.filter(e => e.kind === "event"), wets: list.filter(e => e.kind === "bedwetting" && !isDry(e)), dry: list.filter(isDry), notes: list.filter(e => e.kind === "daynote") };
 }
 function countBy(list, fn) { const m = {}; list.forEach(x => [].concat(fn(x) || []).forEach(k => { if (k) m[k] = (m[k] || 0) + 1; })); return m; }
 
@@ -537,7 +649,7 @@ function makePdf() {
   const R = reportData(from, to), c = child();
   const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = 210, M = 15, CW = W - 2 * M; let y = M;
-  const ink = [27, 35, 40], muted = [93, 107, 117], evC = [194, 65, 12], wetC = [37, 99, 235], line = [221, 227, 232];
+  const ink = [27, 35, 40], muted = [93, 107, 117], evC = [194, 65, 12], wetC = [37, 99, 235], okC = [47, 125, 79], line = [221, 227, 232];
   const setC = c => doc.setTextColor(c[0], c[1], c[2]);
   const ensure = h => { if (y + h > 297 - M) { doc.addPage(); y = M; } };
   const h2 = t => { ensure(14); y += 4; doc.setFont("helvetica", "bold"); doc.setFontSize(13); setC(ink); doc.text(t, M, y); y += 6; doc.setFont("helvetica", "normal"); doc.setFontSize(10); };
@@ -566,8 +678,15 @@ function makePdf() {
     ["Timed events", timed.length ? timed.length + ", from " + Math.min(...timed) + " to " + Math.max(...timed) + " seconds" : "none timed"],
     ["Fell asleep after", sleptAfter + " event" + (sleptAfter === 1 ? "" : "s")],
     ["Video taken", R.events.filter(e => e.data.video).length + " (sent separately)"],
-    ["Bedwetting", R.wets.length + (R.wets.length ? " (soaked through: " + (wt.soaked || 0) + ", small accident: " + (wt.accident || 0) + ")" : "")]
+    ["Wet nights", R.wets.length + (R.wets.length ? " (soaked through: " + (wt.soaked || 0) + ", small accident: " + (wt.accident || 0) + ")" : "")],
+    ["Dry nights logged", String(R.dry.length)]
   ];
+  // Nights: only nights someone actually logged count as dry
+  const nightDays = {}; R.wets.forEach(w => nightDays[dayKey(w.occurred_at)] = "wet"); R.dry.forEach(n => { const k = dayKey(n.occurred_at); if (!nightDays[k]) nightDays[k] = "dry"; });
+  const totalDays = Math.round((new Date(R.to + "T12:00") - new Date(R.from + "T12:00")) / 864e5) + 1;
+  let run = 0, best = 0; for (let d = new Date(R.from + "T12:00"); d <= R.b; d.setDate(d.getDate() + 1)) { if (nightDays[dayKey(d)] === "dry") { run++; best = Math.max(best, run); } else run = 0; }
+  rows.push(["Nights not logged", String(Math.max(0, totalDays - Object.keys(nightDays).length)) + " of " + totalDays]);
+  if (R.dry.length) rows.push(["Longest run of logged dry nights", String(best)]);
   // Bedwetting within 24 hours after an event
   if (R.wets.length) {
     const linked = R.wets.filter(w => R.events.some(e => { const dt = new Date(w.occurred_at) - new Date(e.occurred_at); return dt >= 0 && dt <= 864e5; }));
@@ -580,12 +699,14 @@ function makePdf() {
   h2("Calendar");
   setC(muted); doc.setFontSize(8.5);
   doc.setFillColor(evC[0], evC[1], evC[2]); doc.circle(M + 1.5, y - 1, 1.3, "F"); doc.text("events (number shown)", M + 4, y);
-  doc.setFillColor(wetC[0], wetC[1], wetC[2]); doc.rect(M + 42, y - 2.4, 2.8, 2.8, "F"); doc.text("bedwetting (filled = soaked through)", M + 46.5, y); y += 5;
+  doc.setFillColor(wetC[0], wetC[1], wetC[2]); doc.rect(M + 42, y - 2.4, 2.8, 2.8, "F"); doc.text("wet night (filled = soaked through)", M + 46.5, y);
+  doc.setDrawColor(okC[0], okC[1], okC[2]); doc.setLineWidth(0.6); doc.line(M + 101, y - 1.2, M + 102.2, y); doc.line(M + 102.2, y, M + 104.4, y - 2.6); doc.setLineWidth(0.2); doc.text("dry night logged", M + 106, y); y += 5;
   const start = new Date(R.a); start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
   const cellW = CW / 7, cellH = 11, dn = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   dn.forEach((d, i) => doc.text(d, M + i * cellW + 1.5, y)); y += 2;
   const evByDay = countBy(R.events, e => dayKey(e.occurred_at));
   const wetByDay = {}; R.wets.forEach(w => { const k = dayKey(w.occurred_at); wetByDay[k] = wetByDay[k] === "soaked" ? "soaked" : (w.data.type || "accident"); });
+  const dryByDay = {}; R.dry.forEach(n => dryByDay[dayKey(n.occurred_at)] = true);
   for (let wk = new Date(start); wk <= R.b; wk.setDate(wk.getDate() + 7)) {
     ensure(cellH + 1);
     for (let i = 0; i < 7; i++) {
@@ -594,6 +715,7 @@ function makePdf() {
       if (!inR) continue;
       doc.setFontSize(7.5); setC(muted); doc.text(d.getDate() === 1 || k === dayKey(R.a) ? d.getDate() + " " + d.toLocaleDateString("en-GB", { month: "short" }) : String(d.getDate()), x + 1.2, y + 3);
       if (evByDay[k]) { doc.setFillColor(evC[0], evC[1], evC[2]); doc.circle(x + 3.5, y + 7.3, 1.8, "F"); doc.setFontSize(9); setC(ink); doc.text(String(evByDay[k]), x + 6.2, y + 8.4); }
+      if (!wetByDay[k] && dryByDay[k]) { const cx = x + cellW - 5.6, cy = y + 7.6; doc.setDrawColor(okC[0], okC[1], okC[2]); doc.setLineWidth(0.7); doc.line(cx, cy, cx + 1.3, cy + 1.3); doc.line(cx + 1.3, cy + 1.3, cx + 3.7, cy - 1.6); doc.setLineWidth(0.2); }
       if (wetByDay[k]) { doc.setDrawColor(wetC[0], wetC[1], wetC[2]); doc.setFillColor(wetC[0], wetC[1], wetC[2]); doc.rect(x + cellW - 5.5, y + 5.5, 3.6, 3.6, wetByDay[k] === "soaked" ? "F" : "S"); }
     }
     y += cellH;
@@ -627,7 +749,7 @@ function makePdf() {
   R.list.forEach(e => {
     const k = e.kind === "daynote" && e.data.day ? e.data.day : dayKey(e.occurred_at);
     if (k !== lastDay) { ensure(12); y += 2; doc.setFont("helvetica", "bold"); doc.setFontSize(10.5); setC(ink); doc.text(fmtDay(k + "T12:00") + " " + new Date(k + "T12:00").getFullYear(), M, y); doc.setFont("helvetica", "normal"); y += 5.5; lastDay = k; }
-    const col = e.kind === "event" ? evC : e.kind === "bedwetting" ? wetC : [109, 90, 156];
+    const col = e.kind === "event" ? evC : isDry(e) ? okC : e.kind === "bedwetting" ? wetC : [109, 90, 156];
     const head = (e.kind === "daynote" ? "" : (e.kind === "bedwetting" && e.data.foundMorning ? "Morning  " : fmtTime(e.occurred_at) + "  ")) + entryTitle(e);
     const body = doc.splitTextToSize(entryDetails(e, true) + (e.created_by ? " · logged by " + whoLabel(e.created_by) : ""), CW - 6);
     ensure(5 + body.length * 4.4);
@@ -649,12 +771,7 @@ function makePdf() {
 }
 function downloadBlob(blob, name) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
 
-function exportCsv() {
-  const cols = ["kind", "occurred_at", "logged_by", "summary", "details"];
-  const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
-  const rows = liveEntries().reverse().map(e => [e.kind, e.occurred_at, whoLabel(e.created_by), entryTitle(e), entryDetails(e, true)].map(q).join(","));
-  downloadBlob(new Blob([cols.join(",") + "\n" + rows.join("\n")], { type: "text/csv" }), "symptom-tracker-backup-" + dayKey(new Date()) + ".csv");
-}
+function exportCsv() { backupCsv(Object.values(S.entries), "symptom-tracker-backup-" + dayKey(new Date()) + ".csv"); }
 
 /* ---------- Events ---------- */
 async function enterDiary(id) {
@@ -683,6 +800,7 @@ document.addEventListener("submit", async ev => {
 });
 document.addEventListener("change", ev => {
   const t = ev.target;
+  if (t.name === "type" && t.form && $("#wetBox")) $("#wetBox").hidden = t.value === "dry";
   if (t.name === "after") { const box = $("#sleepBox"); if (box) box.hidden = !checkVals(t.form, "after").includes("asleep"); }
   if (t.name === "seconds" && t.form) { const b = bandFor(parseInt(t.value, 10)); const r = t.form.querySelector('input[name="duration"][value="' + b + '"]'); if (r) r.checked = true; }
   if (t.dataset.act === "filter") { S.filter = t.value; render(); }
@@ -700,11 +818,12 @@ document.addEventListener("click", async ev => {
   else if (act === "timer") openTimer();
   else if (act === "stoptimer") stopTimer();
   else if (act === "brief") openBrief();
+  else if (act === "dry") { saveEntry(blankEntry("bedwetting", { type: "dry" })); toast("Dry night logged"); render(); }
   else if (act === "savebrief") { saveEntry(blankEntry("event", { duration: "brief", seconds: null, certainty: el.dataset.v, seenBy: myLabel() })); closeSheet(); toast("Brief event saved. Tap it to add details."); }
   else if (act === "new") openEntry(blankEntry(el.dataset.kind, el.dataset.kind === "event" ? { seenBy: myLabel() } : el.dataset.kind === "daynote" ? { day: dayKey(new Date()) } : {}));
   else if (act === "edit") { const e = S.entries[el.dataset.id]; if (e) { if ($(".sheet")) closeSheet(); openEntry(JSON.parse(JSON.stringify(e))); } }
   else if (act === "close") closeSheet();
-  else if (act === "delete") { if (confirm("Delete this entry for everyone?")) { const e = JSON.parse(JSON.stringify(S.entries[el.dataset.id])); e.deleted = true; saveEntry(e); closeSheet(); toast("Deleted"); } }
+  else if (act === "delete") { if (await ask({ title: "Delete this entry?", text: "It will be removed from everyone's diary.", ok: "Delete", danger: true })) { const e = JSON.parse(JSON.stringify(S.entries[el.dataset.id])); e.deleted = true; saveEntry(e); closeSheet(); toast("Deleted"); } }
   else if (act === "sync") { await syncNow(); toast(S.syncError ? "Could not sync: " + S.syncError : "Up to date"); }
   else if (act === "range") {
     const to = dayKey(new Date()); let from;
@@ -712,24 +831,31 @@ document.addEventListener("click", async ev => {
     else from = dayKey(Date.now() - (parseInt(el.dataset.days, 10) - 1) * 864e5);
     store.set("reportRange", { from, to }); render();
   }
-  else if (act === "pdf") { try { makePdf(); } catch (e) { console.error(e); toast("Could not make the PDF: " + e.message); } }
+  else if (act === "pdf") { if (DEMO) { toast("The preview can't save files. The sample PDF I sent shows what it makes."); return; } try { makePdf(); } catch (e) { console.error(e); toast("Could not make the PDF: " + e.message); } }
   else if (act === "invite") {
     try { const code = await api.createInvite(S.diaryId); $("#inviteOut").innerHTML = '<div class="code">' + esc(code) + '</div><p class="small muted">Send this to your partner. It works once, for 7 days.</p>' + (navigator.share ? '<button class="btn block" style="margin-bottom:10px" data-act="sharecode" data-code="' + esc(code) + '">Share code</button>' : ""); }
     catch (e) { toast(S.online ? friendly(e) : "You need signal to make a code"); }
   }
   else if (act === "sharecode") navigator.share({ text: "Join our diary in Symptom Tracker: " + location.origin + "\nInvite code: " + el.dataset.code }).catch(() => {});
   else if (act === "rename") {
-    const n = prompt("Your name in the diary", myLabel()); if (!n || !n.trim()) return;
+    const n = await ask({ title: "Your name in the diary", label: "Name", input: myLabel(), ok: "Save" }); if (!n) return;
     try { await api.setLabel(S.diaryId, S.user.userId, n.trim()); store.set("myLabel", n.trim()); await syncNow(true); toast("Changed"); } catch (e) { toast(friendly(e)); }
   }
-  else if (act === "export") exportCsv();
+  else if (act === "export") { if (DEMO) toast("Downloads are switched off in the preview"); else exportCsv(); }
+  else if (act === "dlbackup") { const b = backups()[+el.dataset.i]; if (!b) return; if (DEMO) toast("Downloads are switched off in the preview"); else backupCsv(b.entries, "symptom-tracker-backup-" + b.day + ".csv"); }
+  else if (act === "restore") {
+    const b = backups()[+el.dataset.i]; if (!b) return;
+    if (!(await ask({ title: "Restore the backup from " + fmtDay(b.at) + "?", text: "Every entry in that backup goes back to how it was then, for everyone. Entries added since then are kept.", ok: "Restore" }))) return;
+    b.entries.forEach(e => { S.entries[e.id] = Object.assign({}, e, { _local: true }); S.queue[e.id] = { id: e.id, diary_id: S.diaryId, kind: e.kind, occurred_at: e.occurred_at, data: e.data, deleted: !!e.deleted }; });
+    saveDiaryCache(); render(); await syncNow(true); toast("Backup restored");
+  }
+  else if (act === "resetdemo") { store.del("demoDb"); store.del("cache.demo-diary"); store.del("queue.demo-diary"); store.del("child.demo-diary"); store.del("backups.demo-diary"); location.reload(); }
   else if (act === "signout") {
-    if (Object.keys(S.queue).length && !confirm("Some entries have not synced yet and will be lost if you sign out. Sign out anyway?")) return;
+    if (Object.keys(S.queue).length && !(await ask({ title: "Sign out?", text: "Some entries have not synced yet and will be lost if you sign out.", ok: "Sign out anyway", danger: true }))) return;
     if (S.unsub) S.unsub(); await api.signOut(); S.user = null; S.diaryId = null; store.del("diary"); render();
   }
   else if (act === "deldiary") {
-    if (!confirm("Delete the whole diary, every entry, for everyone? This cannot be undone.")) return;
-    if (prompt('Type DELETE to confirm') !== "DELETE") return;
+    if (!(await ask({ title: "Delete the whole diary?", text: "Every entry will be deleted for everyone. This cannot be undone.", typeWord: "DELETE", ok: "Delete diary", danger: true }))) return;
     try { await api.deleteDiary(S.diaryId); store.del("cache." + S.diaryId); store.del("queue." + S.diaryId); store.del("child." + S.diaryId); S.diaryId = null; store.del("diary"); render(); toast("Diary deleted"); } catch (e) { toast(friendly(e)); }
   }
 });
@@ -758,7 +884,7 @@ async function afterSignIn() {
 (async function boot() {
   try { S.user = await api.session(); } catch (e) { S.user = null; }
   if (S.user) await afterSignIn(); else render();
-  if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("/sw.js").catch(() => {});
+  if (!DEMO && "serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("/sw.js").catch(() => {});
 })();
 </script>
 </body>

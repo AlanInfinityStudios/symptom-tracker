@@ -16,7 +16,7 @@ const phone = { ...devices["iPhone 13"], acceptDownloads: true };
 const A = await browser.newContext(phone), B = await browser.newContext(phone);
 const a = await A.newPage(), b = await B.newPage();
 const errors = [];
-for (const [n, p] of [["A", a], ["B", b]]) { p.on("pageerror", e => errors.push(n + ": " + e.message)); p.on("dialog", d => d.accept(d.type() === "prompt" ? "DELETE" : undefined)); }
+for (const [n, p] of [["A", a], ["B", b]]) { p.on("pageerror", e => errors.push(n + ": " + e.message)); p.on("dialog", d => { errors.push(n + ": unexpected browser dialog " + d.message()); d.dismiss(); }); }
 let step = 0; const ok = m => console.log("  ok " + (++step) + " " + m);
 const shot = (p, n) => p.screenshot({ path: "test/out/" + n + ".png", fullPage: true });
 const expectText = async (p, text, ms = 6000) => { await p.getByText(text).first().waitFor({ timeout: ms }); };
@@ -71,16 +71,20 @@ try {
   // B logs a brief event, bedwetting and a day note
   await b.getByText("Brief event").click(); await shot(b, "07-brief");
   await b.getByRole("button", { name: "Think so" }).click();
-  await b.getByText("Bedwetting", { exact: false }).first().click();
+  await b.getByRole("button", { name: /Wet night/ }).click();
   await b.locator('label.chip:has(input[name="type"][value="soaked"])').click();
   await b.locator('label.chip:has(input[name="hardToWake"][value="yes"])').click();
   await shot(b, "08-bedwetting"); await b.getByRole("button", { name: "Save" }).click();
+  await b.getByRole("button", { name: /^Dry night/ }).click();
+  await expectText(b, "Dry night logged");
   await b.locator('button.k-note').click();
   await b.locator('label.chip:has(input[name="sleep"][value="poor"])').click();
   await b.fill('textarea[name="notes"]', "Late night after a party, very tired at tea time.");
   await b.getByRole("button", { name: "Save" }).click();
   // A past event, logged for Grandma
   await b.getByText("Log a past event").click();
+  const wide = await b.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth, document.querySelector(".sheet").scrollWidth, document.querySelector(".sheet").clientWidth]);
+  if (wide[0] > wide[1] || wide[2] > wide[3]) throw new Error("Past event form is wider than the screen: " + wide.join(","));
   const past = new Date(Date.now() - 3 * 864e5); past.setHours(8, 15, 0, 0);
   const p2 = n => String(n).padStart(2, "0");
   await b.fill('input[name="when"]', past.getFullYear() + "-" + p2(past.getMonth() + 1) + "-" + p2(past.getDate()) + "T08:15");
@@ -90,7 +94,7 @@ try {
   await b.locator('label.chip:has(input[name="after"][value="tired"])').click();
   await b.getByRole("button", { name: "Save" }).click();
   await shot(b, "09-home-b");
-  await expectText(a, "Bedwetting, soaked through", 8000); await expectText(a, "Day note", 8000); ok("Dad sees Mum's brief event, bedwetting and day note");
+  await expectText(a, "Bedwetting, soaked through", 8000); await expectText(a, "Day note", 8000); await expectText(a, "Dry night logged", 8000); ok("Dad sees Mum's brief event, wet night, dry night and day note; past event form fits the screen");
 
   // Offline on A
   await A.setOffline(true);
@@ -110,6 +114,7 @@ try {
   await b.click('nav.tabs button[data-tab="diary"]'); await shot(b, "11-diary");
   await b.locator(".entry", { hasText: "Not sure" }).first().click();
   await b.getByRole("button", { name: "Delete this entry" }).click();
+  await b.locator("#askYes").click();
   await a.waitForFunction(() => !document.body.innerText.includes("Not sure"), null, { timeout: 8000 }); ok("Deleting on one phone removes it on the other");
 
   // Child details appear only on A's titles
@@ -121,6 +126,15 @@ try {
   await a.click('nav.tabs button[data-tab="report"]'); await shot(a, "12-report");
   const [dl] = await Promise.all([a.waitForEvent("download"), a.getByRole("button", { name: "Make PDF report" }).click()]);
   await dl.saveAs("test/out/report.pdf"); ok("PDF made: " + dl.suggestedFilename());
+
+  // Daily backup on the device, and restore brings back the deleted entry
+  await a.click('nav.tabs button[data-tab="more"]');
+  await expectText(a, "Backups on this device"); await a.locator('[data-act="restore"]').first().click(); await a.locator("#askYes").click();
+  await expectText(a, "Backup restored"); await shot(a, "13-backups");
+  await b.waitForFunction(() => document.body.innerText.includes("Not sure"), null, { timeout: 8000 }); ok("Daily backup kept on the phone; restoring it brought the deleted entry back for both");
+  // No page is wider than a small phone screen
+  for (const t of ["home", "diary", "report", "more"]) { await b.click('nav.tabs button[data-tab="' + t + '"]'); const w = await b.evaluate(() => document.documentElement.scrollWidth - window.innerWidth); if (w > 0) throw new Error(t + " tab is " + w + "px too wide"); }
+  ok("No tab scrolls sideways");
 
   // Reload keeps sign-in and data
   await a.reload(); await expectText(a, "Event, 2 seconds"); ok("Reload keeps you signed in with your entries");
