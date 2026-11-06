@@ -71,6 +71,7 @@ try {
   // B logs a brief event, bedwetting and a day note
   await b.getByText("Brief event").click(); await shot(b, "07-brief");
   await b.getByRole("button", { name: "Think so" }).click();
+  await expectText(b, "Edit event"); await b.locator('label.chip:has(input[name="before"][value="eating"])').click(); await b.getByRole("button", { name: "Save" }).click();
   await b.getByRole("button", { name: /Wet night/ }).click();
   await b.locator('label.chip:has(input[name="type"][value="soaked"])').click();
   await b.locator('label.chip:has(input[name="hardToWake"][value="yes"])').click();
@@ -94,11 +95,11 @@ try {
   await b.locator('label.chip:has(input[name="after"][value="tired"])').click();
   await b.getByRole("button", { name: "Save" }).click();
   await shot(b, "09-home-b");
-  await expectText(a, "Bedwetting, soaked through", 8000); await expectText(a, "Day note", 8000); await expectText(a, "Dry night logged", 8000); ok("Dad sees Mum's brief event, wet night, dry night and day note; past event form fits the screen");
+  await expectText(a, "Bedwetting, soaked through", 8000); await expectText(a, "Day note", 8000); await expectText(a, "Dry night logged", 8000); ok("Brief event opens its details straight away; Dad sees Mum's brief event, wet night, dry night and day note; past event form fits the screen");
 
   // Offline on A
   await A.setOffline(true);
-  await a.getByText("Brief event").click(); await a.getByRole("button", { name: "Not sure" }).click();
+  await a.getByText("Brief event").click(); await a.getByRole("button", { name: "Not sure" }).click(); await a.getByRole("button", { name: "Close" }).click();
   await expectText(a, "1 waiting to sync"); await shot(a, "10-offline");
   ok("Offline entry saved on the phone and marked as waiting");
   await A.setOffline(false); await a.evaluate(() => window.dispatchEvent(new Event("online")));

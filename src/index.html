@@ -580,7 +580,7 @@ function noteForm(e) {
 }
 function formBar(e) {
   return (S.entries[e.id] ? '<p class="small muted">Logged by ' + esc(whoLabel(e.created_by)) + (e.updated_by && e.updated_by !== e.created_by ? ", last changed by " + esc(whoLabel(e.updated_by)) : "") + '.</p><button type="button" class="btn danger block" data-act="delete" data-id="' + e.id + '">Delete this entry</button>' : "") +
-    '<div class="bar"><button type="button" class="btn" data-act="close">Cancel</button><button type="submit" class="btn primary">Save</button></div>';
+    '<div class="bar"><button type="button" class="btn" data-act="close">' + (S.entries[e.id] ? "Close" : "Cancel") + '</button><button type="submit" class="btn primary">Save</button></div>';
 }
 function openEntry(e) {
   S.editing = e;
@@ -625,7 +625,7 @@ function stopTimer() {
   clearInterval(S.timerInt); S.timerInt = null;
   const e = blankEntry("event", { seconds: secs, duration: bandFor(secs), seenBy: myLabel(), certainty: "definite" });
   e.occurred_at = new Date(S.timerStart).toISOString();
-  saveEntry(e); toast("Saved: " + secs + " seconds. Add any details now or later.");
+  saveEntry(e); toast("Saved: " + secs + " seconds. Add any details, then Save.");
   openEntry(e);
 }
 function openBrief() {
@@ -819,7 +819,7 @@ document.addEventListener("click", async ev => {
   else if (act === "stoptimer") stopTimer();
   else if (act === "brief") openBrief();
   else if (act === "dry") { saveEntry(blankEntry("bedwetting", { type: "dry" })); toast("Dry night logged"); render(); }
-  else if (act === "savebrief") { saveEntry(blankEntry("event", { duration: "brief", seconds: null, certainty: el.dataset.v, seenBy: myLabel() })); closeSheet(); toast("Brief event saved. Tap it to add details."); }
+  else if (act === "savebrief") { const e = blankEntry("event", { duration: "brief", seconds: null, certainty: el.dataset.v, seenBy: myLabel() }); saveEntry(e); closeSheet(); openEntry(JSON.parse(JSON.stringify(e))); toast("Brief event saved. Add any details, then Save."); }
   else if (act === "new") openEntry(blankEntry(el.dataset.kind, el.dataset.kind === "event" ? { seenBy: myLabel() } : el.dataset.kind === "daynote" ? { day: dayKey(new Date()) } : {}));
   else if (act === "edit") { const e = S.entries[el.dataset.id]; if (e) { if ($(".sheet")) closeSheet(); openEntry(JSON.parse(JSON.stringify(e))); } }
   else if (act === "close") closeSheet();
